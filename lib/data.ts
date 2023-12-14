@@ -78,10 +78,10 @@ export const getPosts = async ({
 export const uploadToCloudinary = async (
   file: string | Blob
 ): Promise<string> => {
-  const formData = new FormData();
-  formData.append("file", file);
-
   try {
+    const formData = new FormData();
+    formData.append("file", file);
+
     const response = await fetch(`http://localhost:3000/api/upload`, {
       method: "POST",
       body: formData,

@@ -3,9 +3,12 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import ReactQuill from "react-quill";
 import { type Category } from "@prisma/client";
 import { getCategories, uploadToCloudinary } from "@/lib/data";
+
+import dynamic from "next/dynamic";
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+
 
 import styles from "./writePage.module.css";
 import "react-quill/dist/quill.bubble.css";
@@ -63,29 +66,32 @@ const WritePage = () => {
   };
 
   useEffect(() => {
-    let isActive = true;
+    if (typeof window !== 'undefined') {
 
-    const uploadFile = async () => {
-      if (file) {
-        try {
-          const url = await uploadToCloudinary(file);
-          if (url) {
-            setImagePreviewUrl(url);
+      let isActive = true;
+
+      const uploadFile = async () => {
+        if (file) {
+          try {
+            const url = await uploadToCloudinary(file);
+            if (url) {
+              setImagePreviewUrl(url);
+            }
+            if (isActive) {
+              setFile(null);
+            }
+          } catch (error) {
+            console.error('Error uploading file:', error);
           }
-          if (isActive) {
-            setFile(null);
-          }
-        } catch (error) {
-          console.error('Error uploading file:', error);
         }
-      }
-    };
+      };
 
-    void uploadFile();
+      void uploadFile();
 
-    return () => {
-      isActive = false;
-    };
+      return () => {
+        isActive = false;
+      };
+    }
   }, [file]);
 
   const uploadFile = () => {
@@ -151,13 +157,15 @@ const WritePage = () => {
       </div>
 
       <div className={styles.editor}>
-        <ReactQuill
-          className={styles.textArea}
-          theme="bubble"
-          value={value}
-          onChange={setValue}
-          placeholder="Write here..."
-        />
+        {typeof window !== "undefined" && (
+          <ReactQuill
+            className={styles.textArea}
+            theme="bubble"
+            value={value}
+            onChange={setValue}
+            placeholder="Write here..."
+          />
+        )}
       </div>
     </div>
   );
