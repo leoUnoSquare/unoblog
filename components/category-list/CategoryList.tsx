@@ -20,7 +20,7 @@ const CategoryList = async () => {
                         href={`/blog?cat=${category.slug}&page=1&limit=4`}
                         key={category.id}
                         className={`${styles.category}`}
-                        style={{ backgroundColor: category.color }}
+                        style={{ backgroundColor: category.color || undefined }}
                     >
                         #{category.slug}
                     </Link>
